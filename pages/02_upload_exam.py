@@ -184,7 +184,12 @@ with tab_zip:
             placeholder="ex: painel anual 2025, todos do Fleury...",
             height=80,
         )
-        analyze_all = st.checkbox("Analisar todos em conjunto com os agentes", value=True)
+        analyze_all = st.checkbox("Analisar com os agentes (requer créditos API)", value=True)
+        batch_size = st.slider(
+            "PDFs por lote de análise (reduza se receber erro de créditos)",
+            min_value=1, max_value=20, value=5,
+            help="Lotes menores = menos tokens por chamada = menos custo.",
+        )
         submitted_zip = st.form_submit_button("📦 Processar ZIP", type="primary")
 
     if submitted_zip:
@@ -247,23 +252,36 @@ with tab_zip:
             )
 
             if analyze_all and all_texts:
-                user_input = f"Painel completo: {len(pdf_entries)} laudos ({zip_date})"
-                if zip_context:
-                    user_input += f"\n\nContexto: {zip_context}"
+                # Split into batches to avoid token limits
+                batches = [all_texts[i:i+batch_size] for i in range(0, len(all_texts), batch_size)]
+                st.info(f"Analisando em {len(batches)} lote(s) de até {batch_size} PDFs cada.")
 
-                with st.spinner(f"Analisando {len(pdf_entries)} laudos em conjunto..."):
-                    try:
-                        result = st.session_state.engine.run(
-                            user_input,
-                            pdf_text="\n\n---\n\n".join(all_texts)[:8000],
-                        )
-                        st.session_state.upload_result = result
-                    except Exception as e:
-                        st.error(f"Erro na análise: {e}")
-                        st.stop()
+                for batch_idx, batch in enumerate(batches):
+                    batch_label = f"Lote {batch_idx+1}/{len(batches)}"
+                    user_input = f"Painel {batch_label}: {len(batch)} laudos ({zip_date})"
+                    if zip_context:
+                        user_input += f"\n\nContexto: {zip_context}"
 
-                st.subheader("Análise Consolidada")
-                _show_debate_result(result)
+                    with st.spinner(f"Analisando {batch_label}..."):
+                        try:
+                            result = st.session_state.engine.run(
+                                user_input,
+                                pdf_text="\n\n---\n\n".join(batch)[:8000],
+                            )
+                            st.session_state.upload_result = result
+                        except Exception as e:
+                            st.error(
+                                f"Erro no {batch_label}: {e}\n\n"
+                                "**Alternativa sem API:** abra o terminal e use o Claude Code diretamente:\n"
+                                "```\ncd healthcore && claude\n```\n"
+                                "Depois cole os laudos extraídos com:\n"
+                                "```\npython3 tools/extract_pdf.py laudos/\n```"
+                            )
+                            break
+
+                    st.subheader(f"Análise — {batch_label}")
+                    _show_debate_result(result)
+                    st.divider()
 
             if all_lab_values:
                 st.divider()
