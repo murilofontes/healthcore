@@ -38,6 +38,52 @@ if not history:
     )
     st.stop()
 
+# ── Consolidated table ────────────────────────────────────────────────────────
+
+st.subheader("Tabela Consolidada")
+st.caption("Todos os marcadores × todas as datas. Células vermelhas = acima da referência, azuis = abaixo.")
+
+all_dates = sorted(set(
+    str(e.date) for entries in history.values() for e in entries if e.date
+))
+
+if all_dates:
+    pivot = {}
+    for marker, entries in sorted(history.items()):
+        row = {}
+        for entry in entries:
+            if entry.date:
+                cell = entry.value
+                if entry.status and ("↑" in entry.status or "↓" in entry.status):
+                    cell = f"{entry.status} {entry.value}"
+                row[str(entry.date)] = cell
+        pivot[marker] = row
+
+    df_pivot = pd.DataFrame(pivot).T
+    df_pivot = df_pivot.reindex(columns=sorted(df_pivot.columns))
+
+    def highlight_cell(val):
+        v = str(val)
+        if "↑" in v:
+            return "background-color: #FFE0E0; color: #CC0000"
+        elif "↓" in v:
+            return "background-color: #E0E8FF; color: #0000CC"
+        elif v and v != "nan":
+            return "background-color: #E8F5E9"
+        return ""
+
+    st.dataframe(
+        df_pivot.style.applymap(highlight_cell),
+        use_container_width=True,
+        height=min(60 + len(pivot) * 35, 500),
+    )
+
+    csv = df_pivot.to_csv(encoding="utf-8")
+    st.download_button("⬇️ Exportar CSV", data=csv.encode("utf-8"),
+                       file_name="exames_consolidado.csv", mime="text/csv")
+
+st.divider()
+
 # ── Latest values overview ────────────────────────────────────────────────────
 
 st.subheader("Últimos Valores")
