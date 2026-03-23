@@ -102,6 +102,36 @@ Exames ou avaliações que tornariam a hipótese mais robusta.
 
 ---
 
+## SALVAMENTO AUTOMÁTICO PÓS-ANÁLISE
+
+**Após toda análise clínica completa (debate + síntese), OBRIGATORIAMENTE:**
+
+1. Pergunte: *"Deseja salvar esta análise no prontuário? (s/n)"*
+2. Se confirmado, execute imediatamente:
+   - Append em `PRONTUARIO.md` com a síntese e data
+   - Append em `EXAMES_HISTORICO.md` com os marcadores identificados (se houver)
+3. Confirme: *"✅ Salvo no prontuário em [data]."*
+
+**Formato do append no PRONTUARIO.md:**
+```
+## Análise HealthCore — [DATA]
+**Laudos analisados:** [nomes dos arquivos]
+**Urgência:** [nível]
+
+### Síntese
+[síntese completa]
+
+### Próximos passos
+[lista de ações]
+```
+
+**Formato do append no EXAMES_HISTORICO.md** (para cada marcador identificado):
+```
+| [DATA] | [VALOR] | [REF] | [STATUS] | via HealthCore CLI |
+```
+
+---
+
 ## ROTEAMENTO DE SKILLS
 
 Detecte automaticamente por palavras-chave e leia o arquivo correspondente:
