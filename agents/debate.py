@@ -35,7 +35,7 @@ from config.guardrails import (
     SNP_ARRAY_PLATFORMS,
     URGENCY_LEVELS,
 )
-from config.settings import ANTHROPIC_API_KEY, LOGS_DIR, MAX_TOKENS, MODEL
+from config.settings import ANTHROPIC_API_KEY, LOGS_DIR, MAX_TOKENS, MODEL, QUICK_MAX_TOKENS, QUICK_MODEL
 from services.memory_manager import (
     load_agent_prompt,
     load_skills,
@@ -181,8 +181,9 @@ class DebateEngine:
 
     def run_quick(self, user_input: str, pdf_text: str = "") -> DebateResult:
         """
-        Fast scan: only Clinical + Orchestrator synthesis (2 API calls).
-        Used for batch processing where speed matters more than full debate.
+        Ultra-cheap batch scan: 1 Haiku call, minimal context.
+        Extracts key markers and urgency flags only.
+        ~$0.002 per call vs ~$0.10 for full Sonnet debate.
         """
         if _is_emergency(user_input):
             result = DebateResult.emergency(user_input)
@@ -194,37 +195,36 @@ class DebateEngine:
             _log_debate(result)
             return result
 
-        prontuario = read_prontuario()
-        exames = read_exames()
-        skills_needed = _detect_skills(user_input + " " + pdf_text, prontuario)
-        skills_context = load_skills(skills_needed) if skills_needed else ""
-
-        clinical_response = self.clinical.analyze(
-            user_input=user_input,
-            prontuario=prontuario,
-            exames=exames,
-            skills_context=skills_context,
-            pdf_text=pdf_text,
+        # Minimal context: just the PDF text, no prontuario/skills overhead
+        prompt = (
+            "Você é um assistente clínico. Analise os laudos abaixo e produza:\n"
+            "1. Lista dos principais marcadores fora de referência\n"
+            "2. Alertas que requerem atenção (se houver)\n"
+            "3. Nível de urgência: EMERGÊNCIA | URGENTE | IMPORTANTE | MONITORAR | INFORMATIVO\n\n"
+            "Seja conciso. Não diagnostique. Use [SUSPEITA] para hipóteses.\n\n"
+            f"LAUDOS:\n{pdf_text[:4000]}"
         )
 
-        synthesis = self._synthesize(
-            user_input=user_input,
-            clinical=clinical_response,
-            skeptic="[Modo rápido — debate cético disponível na análise individual]",
-            genomics="",
-            prontuario=prontuario,
-        )
+        try:
+            response = self.client.messages.create(
+                model=QUICK_MODEL,
+                max_tokens=QUICK_MAX_TOKENS,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            summary = response.content[0].text
+        except Exception as e:
+            summary = f"[Erro no scan rápido: {e}]"
 
-        urgency = _extract_urgency(synthesis + clinical_response)
+        urgency = _extract_urgency(summary)
 
         result = DebateResult(
             user_input=user_input,
-            clinical=clinical_response,
+            clinical=summary,
             skeptic="",
             genomics="",
-            synthesis=synthesis,
+            synthesis=f"**Scan rápido** (Haiku) — use análise individual para debate completo.\n\n{summary}",
             urgency=urgency,
-            skills_used=skills_needed,
+            skills_used=[],
         )
 
         _log_debate(result)

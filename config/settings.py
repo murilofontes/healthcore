@@ -27,7 +27,9 @@ TEMPLATES_DIR = BASE_DIR / "templates"
 # Anthropic
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 MODEL = os.getenv("HEALTHCORE_MODEL", "claude-sonnet-4-6")
+QUICK_MODEL = "claude-haiku-4-5-20251001"  # used for batch scans (~10x cheaper)
 MAX_TOKENS = 8192
+QUICK_MAX_TOKENS = 2048  # enough for a batch summary
 
 # Google Drive (optional)
 GDRIVE_ENABLED = os.getenv("GDRIVE_ENABLED", "false").lower() == "true"
