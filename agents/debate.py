@@ -179,6 +179,57 @@ class DebateEngine:
 
         return result
 
+    def run_quick(self, user_input: str, pdf_text: str = "") -> DebateResult:
+        """
+        Fast scan: only Clinical + Orchestrator synthesis (2 API calls).
+        Used for batch processing where speed matters more than full debate.
+        """
+        if _is_emergency(user_input):
+            result = DebateResult.emergency(user_input)
+            _log_debate(result)
+            return result
+
+        if _is_out_of_scope(user_input):
+            result = DebateResult.out_of_scope(user_input)
+            _log_debate(result)
+            return result
+
+        prontuario = read_prontuario()
+        exames = read_exames()
+        skills_needed = _detect_skills(user_input + " " + pdf_text, prontuario)
+        skills_context = load_skills(skills_needed) if skills_needed else ""
+
+        clinical_response = self.clinical.analyze(
+            user_input=user_input,
+            prontuario=prontuario,
+            exames=exames,
+            skills_context=skills_context,
+            pdf_text=pdf_text,
+        )
+
+        synthesis = self._synthesize(
+            user_input=user_input,
+            clinical=clinical_response,
+            skeptic="[Modo rápido — debate cético disponível na análise individual]",
+            genomics="",
+            prontuario=prontuario,
+        )
+
+        urgency = _extract_urgency(synthesis + clinical_response)
+
+        result = DebateResult(
+            user_input=user_input,
+            clinical=clinical_response,
+            skeptic="",
+            genomics="",
+            synthesis=synthesis,
+            urgency=urgency,
+            skills_used=skills_needed,
+        )
+
+        _log_debate(result)
+        return result
+
     def _synthesize(
         self,
         user_input: str,

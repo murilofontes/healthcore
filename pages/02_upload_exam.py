@@ -186,32 +186,50 @@ if laudos:
         with col_b:
             batch_size = st.selectbox("Lote", [3, 5, 10], index=1, label_visibility="collapsed")
 
-        if st.button(f"▶️ Analisar selecionados ({len(selected)})", type="primary", disabled=not selected):
+        col_btn, col_mode = st.columns([2, 1])
+        with col_mode:
+            quick_mode = st.checkbox("Modo rápido (2 chamadas/lote)", value=True,
+                                     help="Roda só o Agente Clínico + Síntese. Mais rápido e barato. Use a análise individual para o debate completo.")
+        with col_btn:
+            run_batch = st.button(f"▶️ Analisar selecionados ({len(selected)})", type="primary", disabled=not selected)
+
+        if run_batch:
             selected_paths = [l["path"] for l in pending if l["name"] in selected]
             batches = [selected_paths[i:i+batch_size] for i in range(0, len(selected_paths), batch_size)]
-            st.info(f"Processando {len(selected_paths)} laudos em {len(batches)} lote(s).")
+            calls_per_batch = 2 if quick_mode else 4
+            st.info(f"Processando {len(selected_paths)} laudos em {len(batches)} lote(s) · {calls_per_batch} chamadas/lote · ~{len(batches)*calls_per_batch*25}s estimado")
+
+            overall = st.progress(0, text="Iniciando...")
 
             for b_idx, batch in enumerate(batches):
+                overall.progress(b_idx / len(batches), text=f"Lote {b_idx+1}/{len(batches)} — extraindo texto...")
                 texts = []
                 for pdf_path in batch:
-                    with st.spinner(f"Extraindo: {pdf_path.name}"):
-                        texts.append(f"## {pdf_path.name}\n\n{extract_text_from_pdf(pdf_path)}")
+                    texts.append(f"## {pdf_path.name}\n\n{extract_text_from_pdf(pdf_path)}")
 
                 user_input = f"Painel lote {b_idx+1}/{len(batches)}: {len(batch)} laudos"
-                with st.spinner(f"Analisando lote {b_idx+1}/{len(batches)}..."):
-                    try:
+                overall.progress(b_idx / len(batches) + 0.5/len(batches),
+                                 text=f"Lote {b_idx+1}/{len(batches)} — {'Agente Clínico' if quick_mode else 'Clinical → Cético → Síntese'}...")
+                try:
+                    if quick_mode:
+                        result = st.session_state.engine.run_quick(
+                            user_input,
+                            pdf_text="\n\n---\n\n".join(texts)[:8000],
+                        )
+                    else:
                         result = st.session_state.engine.run(
                             user_input,
                             pdf_text="\n\n---\n\n".join(texts)[:8000],
                         )
-                        st.session_state.upload_result = result
-                    except Exception as e:
-                        st.error(f"Erro no lote {b_idx+1}: {e}")
-                        break
+                    st.session_state.upload_result = result
+                except Exception as e:
+                    st.error(f"Erro no lote {b_idx+1}: {e}")
+                    break
 
-                with st.expander(f"📊 Resultado — Lote {b_idx+1}/{len(batches)}", expanded=True):
+                with st.expander(f"📊 Lote {b_idx+1}/{len(batches)} — {', '.join(p.stem for p in batch[:2])}{'...' if len(batch)>2 else ''}", expanded=(b_idx==0)):
                     _show_debate_result(result)
 
+            overall.progress(1.0, text="Concluído!")
             st.rerun()
 
         # Individual pending items
