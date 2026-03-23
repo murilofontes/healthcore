@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #222;
+            max-width: 720px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid #1a5276;
+            padding-bottom: 12px;
+            margin-bottom: 24px;
+        }
+        .header-title h1 {
+            margin: 0;
+            color: #1a5276;
+            font-size: 18pt;
+        }
+        .header-title p {
+            margin: 4px 0 0 0;
+            color: #666;
+            font-size: 9pt;
+        }
+        .header-meta {
+            text-align: right;
+            font-size: 10pt;
+            color: #444;
+        }
+        h2 { color: #1a5276; margin-top: 24px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+        h3 { color: #2e4057; }
+        blockquote {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 16px;
+            margin: 16px 0;
+            border-radius: 4px;
+            font-size: 10pt;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 12px 0;
+            font-size: 10pt;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th { background: #1a5276; color: white; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        hr { border: none; border-top: 1px solid #ddd; margin: 24px 0; }
+        ul, ol { padding-left: 20px; }
+        li { margin-bottom: 4px; }
+        .disclaimer {
+            background: #f8d7da;
+            border: 1px solid #f5c2c7;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin: 16px 0;
+            font-size: 10pt;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 8pt;
+            color: #999;
+            border-top: 1px solid #ddd;
+            padding-top: 12px;
+            text-align: center;
+        }
+        @page {
+            margin: 2cm;
+            @bottom-center {
+                content: "HealthCore — Apoio à Decisão em Saúde | Não é laudo médico";
+                font-size: 8pt;
+                color: #aaa;
+            }
+            @top-right {
+                content: "{{ patient_name }} — {{ report_date }}";
+                font-size: 8pt;
+                color: #aaa;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-title">
+            <h1>🏥 HealthCore</h1>
+            <p>Relatório de Apoio Clínico — Não é laudo médico</p>
+        </div>
+        <div class="header-meta">
+            <strong>{{ patient_name }}</strong><br>
+            {{ report_date }}
+        </div>
+    </div>
+
+    <div class="disclaimer">
+        ⚠️ <strong>Este documento foi gerado por um sistema de apoio à decisão (HealthCore).</strong>
+        Não é um laudo médico, não substitui avaliação clínica e não emite diagnósticos.
+        As informações abaixo são hipóteses clínicas para discussão com o profissional de saúde.
+        Em emergências: <strong>SAMU 192</strong>.
+    </div>
+
+    {{ body_html }}
+
+    <div class="footer">
+        Gerado por <strong>HealthCore v1.0</strong> com Claude Code (Anthropic) &bull;
+        Este documento não tem valor médico-legal &bull;
+        {{ report_date }}
+    </div>
+</body>
+</html>

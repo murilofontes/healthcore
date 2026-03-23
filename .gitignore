@@ -38,6 +38,9 @@ build/
 *.swo
 .DS_Store
 
+# === CLAUDE CODE LOCAL SETTINGS ===
+.claude/settings.local.json
+
 # === TESTES ===
 .pytest_cache/
 htmlcov/
