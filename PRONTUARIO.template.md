@@ -18,20 +18,20 @@
 
 ## Diagnósticos Ativos
 
-<!-- Exemplo:
-- [CONFIRMADO] Resistência à insulina (HOMA-IR 3.2 — 2024-11)
-- [CONFIRMADO] MASLD (elastografia hepática — 2024-09)
-- [SUSPEITA] TDAH — avaliação em andamento
+<!-- Exemplos de formato (apague e substitua pelos seus dados reais):
+- [CONFIRMADO] Hipertensão arterial sistêmica (CID I10 — confirmado 2023-05)
+- [SUSPEITA] Dislipidemia mista — aguardando lipidograma de controle
+- [AGUARDANDO] Avaliação cardiológica — consulta agendada
 -->
 
 ---
 
 ## Medicamentos e Suplementos
 
-<!-- Exemplo:
+<!-- Exemplos de formato (apague e substitua pelos seus dados reais):
 | Medicamento | Dose | Frequência | Início | Médico |
 |-------------|------|------------|--------|--------|
-| Tirzepatida | 5mg  | Semanal    | 2024-10| Dr. X  |
+| Medicamento X | Xmg | Diário | AAAA-MM | Dr. Nome |
 -->
 
 ---

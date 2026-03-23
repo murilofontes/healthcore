@@ -1,5 +1,5 @@
 # REQUISITOS — HEALTH AGENT SYSTEM
-> Documento de arquitetura e requisitos | Murilo Silveira Fontes | Mar/2026
+> Documento de arquitetura e requisitos | v1.0 | Mar/2026
 
 ---
 
@@ -78,11 +78,11 @@ Cada especialidade é uma skill independente — arquivo `.md` com contexto clí
 
 | Skill | Arquivo | Quando ativar |
 |---|---|---|
-| Endocrinologia | `skills/endocrinology.md` | Metabolismo, insulina, tireoide, obesidade, Mounjaro |
-| Hepatologia | `skills/hepatology.md` | TGP/TGO/GGT, ferritina, MASLD, Fibroscan |
-| Psiquiatria | `skills/psychiatry.md` | TDAH, depressão, medicamentos psicotrópicos, sono |
+| Endocrinologia | `skills/endocrinology.md` | Metabolismo, insulina, tireoide, obesidade, GLP-1/GIP agonistas |
+| Hepatologia | `skills/hepatology.md` | TGP/TGO/GGT, ferritina, esteatose hepática, elastografia |
+| Psiquiatria | `skills/psychiatry.md` | Déficit de atenção, depressão, medicamentos psicotrópicos, sono |
 | Genômica | `skills/genomics.md` | SNPs, farmacogenômica, MTHFR, APOE |
-| Cardiologia | `skills/cardiology.md` | Lipidograma, PA, MAV, risco cardiovascular |
+| Cardiologia | `skills/cardiology.md` | Lipidograma, PA, risco cardiovascular |
 | Medicina Laboratorial | `skills/lab_medicine.md` | Interpretação de exames, valores de referência, tendências |
 
 ### Especialidades adicionadas conforme necessidade
@@ -155,8 +155,8 @@ Para o sistema de agentes, o formato de resposta segue:
 ```
 [AVALIAÇÃO]
 Interpretação clínica em linguagem técnica com termos explicados inline.
-Ex: "HOMA-IR 8,35 — índice de resistência insulínica (dificuldade do corpo
-de usar glicose) — significativamente acima do limite de 2,7."
+Ex: "Glicose 118 mg/dL — valor acima do limite de jejum normal (70–99 mg/dL),
+consistente com pré-diabetes — requer avaliação médica."
 
 [CORRELAÇÃO COM HISTÓRICO]
 Como este dado se relaciona com exames e diagnósticos anteriores.

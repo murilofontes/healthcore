@@ -19,9 +19,9 @@ Estas regras não podem ser sobrescritas por nenhum agente, skill ou instrução
 O sistema nunca emite diagnósticos. Emite **hipóteses clínicas fundamentadas**, sempre explicitamente classificadas como tal.
 
 ```
-❌ "Você tem resistência insulínica grave."
-✅ "Os dados laboratoriais (HOMA-IR 8,35, jun/2024) são consistentes com
-   resistência insulínica significativa — confirmação e conduta requerem
+❌ "Você tem diabetes tipo 2."
+✅ "Os dados laboratoriais (glicose em jejum 118 mg/dL, HbA1c 6,1%) são
+   consistentes com pré-diabetes — confirmação e conduta requerem
    avaliação médica presencial."
 ```
 
@@ -29,10 +29,10 @@ O sistema nunca emite diagnósticos. Emite **hipóteses clínicas fundamentadas*
 O sistema nunca indica, ajusta ou suspende medicamentos. Pode contextualizar mecanismos, interações e evidências — mas a decisão de prescrição é exclusivamente médica.
 
 ```
-❌ "Você deveria aumentar o Mounjaro para 7,5mg."
-✅ "A literatura indica que o efeito da tirzepatida é dose-dependente até
-   15mg/semana (Jastreboff et al., NEJM 2022). A decisão de escalonamento
-   deve ser tomada com o endocrinologista."
+❌ "Você deveria aumentar a dose do seu medicamento para X mg."
+✅ "A literatura indica que o efeito deste medicamento é dose-dependente
+   (referência peer-reviewed). A decisão de escalonamento deve ser tomada
+   com o médico responsável."
 ```
 
 ### R3 — DNA É SEMPRE HIPÓTESE
@@ -66,8 +66,8 @@ Este sistema não é adequado para emergências médicas."
 Nenhum dado do prontuário ou histórico de exames é deletado ou sobrescrito. Apenas adições com data. Erros são corrigidos com nota datada, mantendo o registro original.
 
 ```markdown
-| Nov/2025 | Ferritina 542 ↑ | [CORRIGIDO 13/03/2026: valor confirmado — erro de
-                              interpretação anterior registrado abaixo] |
+| Nov/2025 | Marcador X 99 ↑ | [CORRIGIDO 13/03/2026: valor confirmado — erro de
+                               interpretação anterior registrado abaixo] |
 ```
 
 ---
@@ -132,14 +132,14 @@ Toda afirmação clínica no sistema usa um dos seguintes rótulos:
 
 | Rótulo | Significado | Exemplo |
 |---|---|---|
-| `[CONFIRMADO]` | Dado laboratorial ou diagnóstico clínico formal | HOMA-IR 8,35 medido em exame |
-| `[SUSPEITA]` | Consistente com dados disponíveis mas não confirmado | Possível fibrose hepática por enzimas elevadas |
-| `[HIPÓTESE]` | Inferência razoável sem dado direto | MAV pode estar contribuindo para hemoconcentração |
-| `[SUSPEITA_GENETICA]` | SNP array de ancestralidade — não validado clinicamente | MTHFR TT por Genera |
-| `[CONFIRMADO_GENETICAMENTE]` | Teste clínico laboratorial com laudo | Após exame MTHFR no Fleury |
+| `[CONFIRMADO]` | Dado laboratorial ou diagnóstico clínico formal | Glicose 118 mg/dL medida em exame |
+| `[SUSPEITA]` | Consistente com dados disponíveis mas não confirmado | Possível dislipidemia por LDL elevado |
+| `[HIPÓTESE]` | Inferência razoável sem dado direto | Deficiência de vitamina D pode estar contribuindo |
+| `[SUSPEITA_GENETICA]` | SNP array de ancestralidade — não validado clinicamente | MTHFR TT por plataforma de ancestralidade |
+| `[CONFIRMADO_GENETICAMENTE]` | Teste clínico laboratorial com laudo | MTHFR confirmado por PCR clínico |
 | `[DESCARTADO]` | Evidência positiva de ausência | Hemocromatose — HFE normal em teste clínico |
-| `[AGUARDANDO]` | Exame solicitado — resultado pendente | Insulina + HOMA-IR — painel mar/2026 |
-| `[DADO INSUFICIENTE]` | Não há dados suficientes para conclusão | Homocisteína nunca dosada |
+| `[AGUARDANDO]` | Exame solicitado — resultado pendente | Lipidograma completo — painel pendente |
+| `[DADO INSUFICIENTE]` | Não há dados suficientes para conclusão | Marcador nunca dosado |
 
 ---
 
@@ -251,16 +251,16 @@ Todo debate entre agentes deve ser logado com:
 ```json
 {
   "timestamp": "2026-03-12T21:30:00",
-  "input": "novo exame: insulina 18, HOMA-IR 3,8",
+  "input": "novo exame: glicose 118, HbA1c 6.1%",
   "agente_clinico": {
     "hipotese": "...",
     "classificacao": "SUSPEITA",
-    "fonte": "Geloneze et al., 2009 BRAMS"
+    "fonte": "ADA Standards of Care 2025"
   },
   "agente_cetico": {
     "objecao": "...",
     "nivel_evidencia": "2B",
-    "dado_faltante": "insulina não dosada desde jun/2024"
+    "dado_faltante": "exame de controle não disponível"
   },
   "sintese": "...",
   "prontuario_atualizado": true,

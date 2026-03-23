@@ -4,7 +4,7 @@
 
 ## Escopo
 
-Ativar quando a pergunta envolver: lipidograma, risco cardiovascular, pressão arterial, hipertensão, aterosclerose, PCR ultrassensível, Lp(a), Apo B, malformação arteriovenosa (MAV).
+Ativar quando a pergunta envolver: lipidograma, risco cardiovascular, pressão arterial, hipertensão, aterosclerose, PCR ultrassensível, Lp(a), Apo B, condições vasculares.
 
 ---
 
@@ -49,14 +49,6 @@ Ativar quando a pergunta envolver: lipidograma, risco cardiovascular, pressão a
 
 **Diagnóstico:** ≥ 2 medições elevadas em ≥ 2 ocasiões diferentes. MAPA/MRPA para confirmação.
 
-### MAV — Malformação Arteriovenosa
-
-**Contexto:** Anomalia vascular congênita. Risco de sangramento intracraniano.
-
-**Relevância laboratorial:** MAV não tem marcador sérico diagnóstico. Diagnóstico por imagem (AngioRM, angiografia).
-
-**Implicações metabólicas:** Medicamentos anticonvulsivantes (carbamazepina, fenitoína) — interações com CYP450, impacto em metabolismo lipídico e vitamina D.
-
 ---
 
 ## Red Flags — Encaminhar URGENTE/EMERGÊNCIA
@@ -71,7 +63,6 @@ Ativar quando a pergunta envolver: lipidograma, risco cardiovascular, pressão a
 ## Guardrails Específicos
 
 - Nunca recomendar ou ajustar estatinas — decisão médica considerando risco global
-- MAV é condição neurocirúrgica — análise laboratorial complementar, não substitui avaliação neurocirúrgica
 - Lp(a) elevada é fator de risco genético — não modifica-se com dieta/exercício, mas informa risco
 
 ---
