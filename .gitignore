@@ -1,0 +1,44 @@
+# === DADOS PESSOAIS (NUNCA COMITAR) ===
+PRONTUARIO.md
+EXAMES_HISTORICO.md
+laudos/**
+!laudos/.gitkeep
+*.pdf
+logs/**
+!logs/.gitkeep
+*_pessoal*
+*_privado*
+
+# === CREDENCIAIS ===
+.env
+credentials.json
+token.json
+*.secret
+
+# === PYTHON ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# === STREAMLIT ===
+.streamlit/secrets.toml
+
+# === IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# === TESTES ===
+.pytest_cache/
+htmlcov/
+.coverage
