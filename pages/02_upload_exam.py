@@ -39,27 +39,28 @@ if "upload_result" not in st.session_state:
 # Helpers
 # ══════════════════════════════════════════════════════════════════════════════
 
+_ANALYZED_FILE = LOGS_DIR.parent / "analyzed_labels.txt"
+
+
 def _analyzed_labels() -> set:
-    """Returns set of PDF labels that already have a debate log entry."""
-    labels = set()
-    if not LOGS_DIR.exists():
-        return labels
-    for log_file in sorted(LOGS_DIR.glob("*.jsonl")):
-        try:
-            for line in log_file.read_text(encoding="utf-8").splitlines():
-                entry = json.loads(line)
-                inp = entry.get("input", "").lower()
-                # Match "novo laudo: label" or "painel completo"
-                if "novo laudo:" in inp or "painel" in inp:
-                    # extract label after "novo laudo: "
-                    if "novo laudo:" in inp:
-                        label = inp.split("novo laudo:")[-1].split("(")[0].strip()
-                        labels.add(label)
-                    if "painel" in inp:
-                        labels.add("__zip__")
-        except Exception:
-            continue
-    return labels
+    """Returns set of PDF labels that have been analyzed."""
+    if not _ANALYZED_FILE.exists():
+        return set()
+    return set(
+        line.strip()
+        for line in _ANALYZED_FILE.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    )
+
+
+def _mark_analyzed(labels: List[str]) -> None:
+    """Appends labels to the analyzed tracking file."""
+    LOGS_DIR.parent.mkdir(parents=True, exist_ok=True)
+    existing = _analyzed_labels()
+    new_labels = [l for l in labels if l not in existing]
+    if new_labels:
+        with _ANALYZED_FILE.open("a", encoding="utf-8") as f:
+            f.write("\n".join(new_labels) + "\n")
 
 
 def _list_laudos() -> List[Dict]:
@@ -140,6 +141,7 @@ def _run_analysis(pdf_path: Path, label: str, context: str = "") -> None:
             st.error(f"Erro na análise: {e}")
             return
 
+    _mark_analyzed([label])
     _show_debate_result(result)
 
     if lab_values:
@@ -222,6 +224,7 @@ if laudos:
                             pdf_text="\n\n---\n\n".join(texts)[:8000],
                         )
                     st.session_state.upload_result = result
+                    _mark_analyzed([p.stem for p in batch])
                 except Exception as e:
                     st.error(f"Erro no lote {b_idx+1}: {e}")
                     break
