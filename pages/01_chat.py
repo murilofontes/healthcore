@@ -10,7 +10,7 @@ import streamlit as st
 
 from agents.debate import DebateEngine, DebateResult
 from config.guardrails import URGENCY_LEVELS
-from services.memory_manager import append_to_prontuario, read_prontuario
+from services.memory_manager import append_to_prontuario, mark_analyzed, read_prontuario
 
 st.set_page_config(page_title="Chat — HealthCore", page_icon="💬", layout="wide")
 
@@ -77,6 +77,12 @@ if user_input:
             try:
                 result: DebateResult = st.session_state.engine.run(user_input)
                 st.session_state.last_result = result
+                # Mark PDF as analyzed if referenced via "novo laudo: label" pattern
+                lower = user_input.lower()
+                if "novo laudo:" in lower:
+                    label = lower.split("novo laudo:")[-1].split("(")[0].strip()
+                    if label:
+                        mark_analyzed([label])
             except Exception as e:
                 st.error(f"Erro ao processar: {e}")
                 st.stop()

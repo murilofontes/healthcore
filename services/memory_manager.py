@@ -12,9 +12,35 @@ from typing import List, Optional
 from config.settings import (
     AGENT_PROMPTS_DIR,
     EXAMES_PATH,
+    LOGS_DIR,
     PRONTUARIO_PATH,
     SKILLS_DIR,
 )
+
+# ── Analyzed labels tracking ───────────────────────────────────────────────────
+
+_ANALYZED_FILE = LOGS_DIR.parent / "analyzed_labels.txt"
+
+
+def get_analyzed_labels() -> set:
+    """Returns set of PDF labels that have been analyzed."""
+    if not _ANALYZED_FILE.exists():
+        return set()
+    return set(
+        line.strip()
+        for line in _ANALYZED_FILE.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    )
+
+
+def mark_analyzed(labels: List[str]) -> None:
+    """Appends labels to the analyzed tracking file (append-only)."""
+    _ANALYZED_FILE.parent.mkdir(parents=True, exist_ok=True)
+    existing = get_analyzed_labels()
+    new_labels = [l for l in labels if l not in existing]
+    if new_labels:
+        with _ANALYZED_FILE.open("a", encoding="utf-8") as f:
+            f.write("\n".join(new_labels) + "\n")
 
 
 # ── Core reads ────────────────────────────────────────────────────────────────

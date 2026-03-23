@@ -17,7 +17,7 @@ import streamlit as st
 from agents.debate import DebateEngine
 from config.guardrails import URGENCY_LEVELS
 from config.settings import LAUDOS_DIR, LOGS_DIR
-from services.memory_manager import append_to_exames
+from services.memory_manager import append_to_exames, get_analyzed_labels, mark_analyzed
 from services.pdf_parser import extract_lab_values, extract_text_from_pdf, store_laudo
 
 st.set_page_config(page_title="Exames — HealthCore", page_icon="📄", layout="wide")
@@ -39,28 +39,6 @@ if "upload_result" not in st.session_state:
 # Helpers
 # ══════════════════════════════════════════════════════════════════════════════
 
-_ANALYZED_FILE = LOGS_DIR.parent / "analyzed_labels.txt"
-
-
-def _analyzed_labels() -> set:
-    """Returns set of PDF labels that have been analyzed."""
-    if not _ANALYZED_FILE.exists():
-        return set()
-    return set(
-        line.strip()
-        for line in _ANALYZED_FILE.read_text(encoding="utf-8").splitlines()
-        if line.strip()
-    )
-
-
-def _mark_analyzed(labels: List[str]) -> None:
-    """Appends labels to the analyzed tracking file."""
-    LOGS_DIR.parent.mkdir(parents=True, exist_ok=True)
-    existing = _analyzed_labels()
-    new_labels = [l for l in labels if l not in existing]
-    if new_labels:
-        with _ANALYZED_FILE.open("a", encoding="utf-8") as f:
-            f.write("\n".join(new_labels) + "\n")
 
 
 def _list_laudos() -> List[Dict]:
@@ -141,7 +119,7 @@ def _run_analysis(pdf_path: Path, label: str, context: str = "") -> None:
             st.error(f"Erro na análise: {e}")
             return
 
-    _mark_analyzed([label])
+    mark_analyzed([label])
     _show_debate_result(result)
 
     if lab_values:
@@ -154,7 +132,7 @@ def _run_analysis(pdf_path: Path, label: str, context: str = "") -> None:
 # ══════════════════════════════════════════════════════════════════════════════
 
 laudos = _list_laudos()
-analyzed = _analyzed_labels()
+analyzed = get_analyzed_labels()
 
 st.title("📄 Exames")
 
@@ -224,7 +202,7 @@ if laudos:
                             pdf_text="\n\n---\n\n".join(texts)[:8000],
                         )
                     st.session_state.upload_result = result
-                    _mark_analyzed([p.stem for p in batch])
+                    mark_analyzed([p.stem for p in batch])
                 except Exception as e:
                     st.error(f"Erro no lote {b_idx+1}: {e}")
                     break
